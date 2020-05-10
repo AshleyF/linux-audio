@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
 
-#define nBlocks 1000
+#define nBlocks 5000
 #define blockSize 128
 
 short bufs[nBlocks][blockSize * 2];
-const char* recdevice = "plughw:1,0";
-const char* playdevice = "plughw:1,0";
+const char* recdevice = "hw:1,0";
+const char* playdevice = "hw:1,0";
 int rate = 44100;
 int *pRate = &rate;
 const int channels = 1;
@@ -69,7 +69,7 @@ void capture()
 		exit (1);
 	}
 
-	// snd_pcm_hw_params_free (hw_params);
+	snd_pcm_hw_params_free (hw_params);
 
 	if ((err = snd_pcm_prepare (capture_handle)) < 0) {
 		fprintf (stderr, "cannot prepare audio interface for use (%s)\n",

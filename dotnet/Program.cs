@@ -105,7 +105,7 @@ namespace dotnet
 			// TODO: support other formats?
 			fixed (void* pBuffer = buffer)
 			{
-				if (Read(handle, pBuffer, (ulong)size) != size)
+				if (Read(handle, pBuffer, (uint)size) != size)
 				{
 					throw new ArgumentException("Read failed.");
 				}
@@ -117,7 +117,7 @@ namespace dotnet
 			// TODO: support other formats?
 			fixed (void* pBuffer = buffer)
 			{
-				if (Write(handle, pBuffer, (ulong)size) != size)
+				if (Write(handle, pBuffer, (uint)size) != size)
 				{
 					throw new ArgumentException("Write failed.");
 				}
@@ -169,10 +169,10 @@ namespace dotnet
 		private static unsafe extern int PrepareHandle(void *handle);
 
 		[DllImport("asound", EntryPoint="snd_pcm_readi")]
-		private static unsafe extern long Read(void *handle, void* buffer, ulong blockSize);
+		private static unsafe extern int Read(void *handle, void* buffer, uint blockSize);
 
 		[DllImport("asound", EntryPoint="snd_pcm_writei")]
-		private static unsafe extern long Write(void *handle, void* buffer, ulong blockSize);
+		private static unsafe extern int Write(void *handle, void* buffer, uint blockSize);
 
 		[DllImport("asound", EntryPoint="snd_pcm_close")]
 		private static unsafe extern int CloseHandle(void *handle);
@@ -187,9 +187,10 @@ namespace dotnet
 				// record
 
 				Console.WriteLine("ALSA Test App");
-				var device = "plughw:0,0";
+				var recDevice = "plughw:2,0";
+				var playDevice = "plughw:2,0";
 
-				var recHandle = LinuxAudioInterop.Open(device, true);
+				var recHandle = LinuxAudioInterop.Open(recDevice, true);
 				Console.WriteLine("Opened");
 				var recParam = LinuxAudioInterop.HardwareParamsMalloc();
 				Console.WriteLine("Params");
@@ -218,15 +219,17 @@ namespace dotnet
 				for (var i = 0; i < numBlocks; i++)
 				{
 					LinuxAudioInterop.Read(recHandle, buf, blockSize);
-					recorded[i] = (byte[])buf.Clone();
+					var copy = new byte[blockSize * 2];
+					Array.Copy(buf, copy, blockSize * 2);
+					recorded[i] = copy;
+					//recorded[i] = (byte[])buf.Clone();
 					Console.WriteLine($"Read buffer: {buf[0]}");
 				}
 
 				LinuxAudioInterop.Close(recHandle);
 
 				// playback
-
-				var playHandle = LinuxAudioInterop.Open(device, false);
+				var playHandle = LinuxAudioInterop.Open(playDevice, false);
 				Console.WriteLine("Opened");
 				var playParam = LinuxAudioInterop.HardwareParamsMalloc();
 				Console.WriteLine("Params");
