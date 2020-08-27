@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GtkSharp" Version="3.22.25.125" />
+    <PackageReference Include="Microsoft.Psi.Imaging.Linux" Version="0.2.123.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\psi\Sources\Media\Microsoft.Psi.Media.Linux\Microsoft.Psi.Media.Linux.csproj" />
+  </ItemGroup>
+
+</Project>

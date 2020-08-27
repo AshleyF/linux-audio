@@ -1,19 +1,18 @@
-﻿using System;
-using Gtk;
-using Gdk;
-using System.Runtime.InteropServices;
-using Microsoft.Psi;
-using Microsoft.Psi.Media;
-using System.Threading;
-using Microsoft.Psi.Imaging;
-
-namespace XamarinCore
+﻿namespace VideoSample
 {
+    using System;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using Gtk;
+    using Gdk;
+    using Microsoft.Psi;
+    using Microsoft.Psi.Imaging;
+    using Microsoft.Psi.Media;
+	
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
             Application.Init();
             var bld = new Builder();
             bld.AddFromString(
@@ -41,30 +40,18 @@ namespace XamarinCore
             {
                 using (var pipeline = Pipeline.Create())
                 {
-                    ////var webcam = new MediaCapture(pipeline, 1920, 1080, 30);
-                    var webcam = new MediaCapture(pipeline, 640, 480, 30);
-                    webcam.Video.Do(frame =>
+                    var webcam = new MediaCapture(pipeline, 640, 480, "/dev/video0", PixelFormatId.YUYV);
+                    webcam.Out.Do(frame =>
                     {
-                        Console.Write(".");
                         var len = frame.Resource.Width * frame.Resource.Height * 3;
                         var data = new byte[len];
                         Marshal.Copy(frame.Resource.ImageData, data, 0, len);
                         var buf = new Pixbuf(data, false, 8, frame.Resource.Width, frame.Resource.Height, frame.Resource.Stride);
                         img.Pixbuf = buf;
                     });
-
                     pipeline.Run();
                 }
-            })).Start();
-
-
-            ////var images = webcam.Out.EncodeJpeg(90, DeliveryPolicy.LatestMessage).Out;
-
-            ////int dataLen = img.Resource.Width * img.Resource.Height * 3;
-            ////byte[] imageData = new byte[dataLen];
-            ////System.Runtime.InteropServices.Marshal.Copy(img.Resource.ImageData, imageData, 0, dataLen);
-            ////var pixbuf = new Gdk.Pixbuf(imageData, false, 8, img.Resource.Width, img.Resource.Height, img.Resource.Stride);
-            ////imgCtrl.Pixbuf = pixbuf.ScaleSimple(900, 640, Gdk.InterpType.Bilinear);
+            })) { IsBackground = true }.Start();
 
             Application.Run();
         }
